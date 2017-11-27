@@ -10,16 +10,19 @@ import java.util.Iterator;
 /**
  *
  * @author sharo
+ * @param <T>
  */
 public interface Tree<T extends Comparable> {
     
     public Tree add(T element);
-    public int contains(T element);
-    public Tree rebalance();
+    boolean contains(T element);
     public Tree remove();
     public T retrieve();
-    public boolean isEmpty();
-    public int getDepth();
-    public Iterator iterator();
+    boolean isEmpty();
+    public int size();
+    public Iterator<T> preIterator();
+    public Iterator<T> postIterator();
+    public Iterator<T> inIterator();
+    
 }
 
