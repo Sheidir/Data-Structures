@@ -39,7 +39,7 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
         }
 
         public String toString() {
-            return "(" + data + " " + lchild + " " + rchild + ")";
+            return "(data: " + data + " lchild: " + lchild + " rchild: " + rchild + ")";
         }
 /**
  * Counts the number of descendents on a line, given that the other line is null. Useful for calculating depth.
@@ -82,11 +82,29 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
     public int size() {
         return size;
     }
+    public int balanceFactor(Node n){
+        int rfactor;
+        int lfactor;
+        if(n.rchild != null){
+        rfactor =  1+ depth(n.rchild);
+        } else{
+        rfactor = 0;
+        }
+    
+    if(n.lchild != null){
+            lfactor =  1 + depth(n.lchild);
+        } else{
+        lfactor = 0;
+        }
+    
+    return lfactor - rfactor;
+    }
+    
 /**
  * Returns depth of tree
  * @return 
  */
-    public int depth() {
+    private int depth() {
         return depth(root);
     }
 
@@ -103,31 +121,43 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
         }
         return 0;
     }
-/**
+    @Override
+    public String toString(){
+    Iterator it = inIterator();
+    StringBuilder s = new StringBuilder();
+    while (it.hasNext()){
+    s.append(it.next().toString());
+    
+    }
+    return s.toString();
+    }
+   public Comparable getRoot(){
+    return root.data;
+}
+/** 
+ * 
  * Returns whether the tree is balanced.
  * @return 
  */
-    public boolean balanced() {
-        if (root == null) {
-            return true;
+    public void balanced() { 
+        int balance = balanceFactor(root);
+        if (root != null && balance > 1 || balance < -1) {
+            rebalance(root, 0, balance);
         }
-        return balanced(root);
+        
 
     }
 
-    private boolean balanced(Node n) {
-        if (n.rchild != null && n.lchild != null) {
-            return Math.abs(depth(n.rchild) - depth(n.lchild)) <= 1;//check this. 
-        } else {
-            if (n.rchild != null && n.numDescendents() <= 1) {
-                return true;
-            }
-            if (n.lchild != null && n.numDescendents() <= 1) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean balanced(Node n) {
+//        int balance = balanceFactor(n);
+//        if(balance > 1 || balance < -1){
+//        return false;
+//        }
+//        else{
+//        return true;
+//        }
+//    }
+        
 /**
  * Checks whether an element is contained in the tree. 
  * @param element
@@ -176,14 +206,15 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
             if (n.lchild == null) {
                 n.lchild = new Node(element, n);
                 n.lchild.parent = n;
-                if (n != root) {
-                    if (!balanced(n.parent)) {
-                        rebalance(n.parent);
-                    }
-                } else if (!balanced(n)) {
-                    rebalance(n);
-                    return this;
-                }
+                balanced();
+//                if (n != root) {
+//                    if (!balanced()) {
+//                        rebalance(n.parent);
+//                    }
+//                } else if (!balanced()) {
+//                    rebalance(n);
+//                    return this;
+//                }
             } else {
                 return add(element, n.lchild);
             }
@@ -192,9 +223,14 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
             if (n.rchild == null) {
                 n.rchild = new Node(element, n);
                 n.rchild.parent = n;
-                if (n != root && !balanced(n.parent)) {
-                    rebalance(n.parent);
-                }
+                balanced();
+//                if (!balanced()) {
+//                    if(n != root){
+//                    rebalance(n.parent);
+//                }else{
+//                    rebalance(n);
+//                    }
+//                }
                 return this;
             } else {
                 return add(element, n.rchild);
@@ -207,52 +243,112 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
  * @param n
  * @return 
  */
-    private Tree rebalance(Node n) {
-        if (depth(n.rchild) < depth(n.lchild)) {
-            rotateRight(n);
-        } else if (depth(n.rchild) > depth(n.lchild)) {
-            rotateLeft(n);
+
+//    private void rebalance(Node n, int balanceFactor) {
+//        
+//        if(balanceFactor == -2){
+//            int childbalance = balanceFactor(n.rchild);
+//            rebalance(n.rchild, balanceFactor, childbalance);
+//        }else if(balanceFactor == 2){
+//            rebalance(n.lchild, balanceFactor(n.lchild));
+//        }
+//        
+//    }
+    private void rebalance(Node n, int parentFactor, int balanceFactor){
+             if(balanceFactor == -2){
+            rebalance(n.rchild, balanceFactor, balanceFactor(n.rchild));
+        }else if(balanceFactor == 2){
+            rebalance(n.lchild, balanceFactor, balanceFactor(n.lchild));
         }
-        if (!balanced()) {
-            rebalance(n.parent);
-        }
-        return this;
+             
+//             balanceFactor = balanceFactor(n); //Update;
+//                      
+//        if(parentFactor == 2){
+//            if(balanceFactor == 1){
+//            rotate(n, true);
+//            }else{
+//            rotate(n, false);
+//            rotate(n.parent, true);
+//            }            
+//                      
+//    } else{
+//        if(balanceFactor ==1){
+//        rotate (n, true);
+//        rotate (n.parent, false);
+//        }else{
+//        rotate(n, false);
+//        }
+//        
+//        }
     }
-
-    private Tree rotateRight(Node n) {
-        boolean rootFlagged = false;
+//    private Tree rotateRight(Node n) {
+//        boolean rootFlagged = false;
+//        Node parent;
+//        Node temp = n.parent;
+//        if (n == root) {
+//            rootFlagged = true;           
+//        }
+//            parent = n.lchild;
+//        link(parent, n, true);
+//        parent.parent = temp;
+//             if(temp != null){
+//        parent.parent.rchild = parent;
+//        }
+//        n.lchild = null;
+//        
+//        if (rootFlagged) {
+//            root = parent;
+//        }
+//
+//        return this;
+//    }
+    private void rotate(Node n, boolean right){
+        boolean rootFlagged = true;
         Node parent;
-        Node temp = n.parent;
-        if (n == root) {
-            rootFlagged = true;           
-        }
-            parent = n.lchild;
-        link(parent, n, true);
-        n.lchild = null;
-        parent.parent = temp;
-        if (rootFlagged) {
-            root = parent;
-        }
-
-        return this;
-    }
-
-    private Tree rotateLeft(Node n) {
-        boolean rootFlagged = false;
-        Node parent;
-        Node temp = n.parent;
-        if (n == root) {
-            rootFlagged = true;
-        }
+        Node tempP = n.parent;
+        Node tempC;
+        if(right){
+        parent = n.lchild;
+        tempC = n.rchild;
+        }else{
         parent = n.rchild;
-        link(parent, n, false);
-        n.rchild = null;
-        parent.parent = temp;
+        tempC = n.lchild;
+        }
+         if (n != root) {
+            rootFlagged = false;
+            link(tempP, parent, n == tempP.rchild);
+        }
+        link(parent, n, right);
+        if(right){
+        n.lchild = tempC;
+        }else{
+        n.rchild = tempC;
+        }
+                
         if (rootFlagged) {
             root = parent;
+            root.parent = null;
         }
-        return this;
     }
+
+
+//    private Tree rotateLeft(Node n) {
+//        boolean rootFlagged = true;
+//        Node parent;
+//        Node temp = n.parent;
+//        parent = n.rchild;
+//        if (n != root) {
+//            rootFlagged = false;
+//            link(temp, parent, n == temp.rchild);
+//        }
+//        link(parent, n, false);
+//        n.rchild = null;        
+//        if (rootFlagged) {
+//            root = parent;
+//            root.parent = null;
+//        }
+//        return this;
+//    }
 /**
  * Removes element from the tree.
  * @return 
@@ -395,8 +491,16 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
         } else {
             System.out.println("not empty");
         }
-        t.add("D").add("B").add("A").add("C").add("E").add("Z").add("M").add("X");
-        System.out.println("Root is " + t.root.data);
+        t.add("A");
+        System.out.println("Added 'A' Root is " + t.root.data);
+        t.add("D")
+        .add("B");
+        System.out.println("Added 'D' and 'B' Root is " + t.root.data);
+        t.add("C");
+        System.out.println("Added 'C' Root is " + t.root.data);
+        
+        t.add("E").add("Z").add("M").add("X");
+        System.out.println("Added E, Z, M, X. Root is " + t.root.data);
         System.out.println(t.toString());
         System.out.println("Element in order:");
         Iterator<String> it = t.inIterator();
