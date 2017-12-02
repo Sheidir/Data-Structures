@@ -136,8 +136,8 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
 }
 /** 
  * 
- * Returns whether the tree is balanced.
- * @return 
+ * Checks whether the Tree is balanced, and starts on appropriate action.
+ * 
  */
     public void balance() { 
         int balance = balanceFactor(root);
@@ -157,25 +157,34 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
  */
     @Override
     public boolean contains(T element) {
-        return contains(element, root);
+        return contains(element, root, false);
     }
-
-    private boolean contains(T element, Node n) {
+/**
+ * Checks whether the Tree contains an element. Ties into the remove function if remove is true.
+ * @param element
+ * @param n
+ * @param remove 
+ * @return 
+ */
+    private boolean contains(T element, Node n, boolean remove) {
         if (n == null) {
             return false;
         }
         if (n.data.compareTo(element) == 0) {
+            if(remove){
+            
+            }
             return true;
         }
         if (n.data.compareTo(element) > 0) {
-            return contains(element, n.lchild);
+            return contains(element, n.lchild, remove);
 
         } else {
-            return contains(element, n.rchild);
+            return contains(element, n.rchild, remove);
         }
     }
 /**
- * Adds element to the tree, inserting in order, and rebalancing as necessary.
+ * Adds element to the tree, inserting in order, and rebalancing as necessary. Does not allow duplicates.
  * @param element
  * @return 
  */
@@ -189,7 +198,12 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
         return add(element, root);
 
     }
-
+/**
+ * Recursive adding method.
+ * @param element
+ * @param n
+ * @return 
+ */
     private Tree<T> add(T element, Node n) {
         if (contains(element)) {
             System.out.print("Add failed. No duplicates allowed on AVL tree");
@@ -215,7 +229,12 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
         }
         return this;
     }
-    
+    /**
+     * Checks whether both numbers are negative or non-negative.
+     * @param one
+     * @param two
+     * @return true if they share same sign, otherwise false.
+     */
     private boolean matchSigns(int one, int two){
         if(one == 0 || two == 0){
         return true;
@@ -227,6 +246,12 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
     }
     return false;
     }
+    /**
+     * Rebalances the tree recursively
+     * @param n the node in question
+     * @param right whether the node requires a right turn to bring it into balance.
+     * @param balanceFactor the depth of the left subtree - the depth of the right subtree.
+     */
     private void rebalance(Node n, boolean right, int balanceFactor){
         Node child;
         if (balanceFactor == 2 || balanceFactor == -2){
@@ -238,16 +263,20 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
                 int childFactor = balanceFactor(child);
                  if(childFactor == balanceFactor){
             rebalance(child, right, childFactor);
-                 }else if (!matchSigns(childFactor, balanceFactor)){
+                 }else if (!matchSigns(childFactor, balanceFactor)){ //if signs do not match, double rotation required.
                rebalance(child, !right, childFactor);  
                  }
-        }       balanceFactor = balanceFactor(root);
+        }       balanceFactor = balanceFactor(root); //Check again if root is balanced.
         if(balanceFactor > 1 || balanceFactor < -1){
                 rotate(n, right);
         }
         }
              
-             
+             /**
+              * Rotates the node.
+              * @param n the node to rotate.
+              * @param right true for right rotation, false for left.
+              */
     private void rotate(Node n, boolean right){
         boolean rootFlagged = true;
         Node parent;
@@ -278,30 +307,16 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
     }
 
 
-//    private Tree rotateLeft(Node n) {
-//        boolean rootFlagged = true;
-//        Node parent;
-//        Node temp = n.parent;
-//        parent = n.rchild;
-//        if (n != root) {
-//            rootFlagged = false;
-//            link(temp, parent, n == temp.rchild);
-//        }
-//        link(parent, n, false);
-//        n.rchild = null;        
-//        if (rootFlagged) {
-//            root = parent;
-//            root.parent = null;
-//        }
-//        return this;
-//    }
 /**
- * Removes element from the tree.
+ * Finds and removes provided element.
+ * @param element
  * @return 
  */
     @Override
-    public Tree remove() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Tree remove(T element) {
+        contains(element, root, true);
+        return this;
+
     }
 /**
  * Returns whether it is empty.
