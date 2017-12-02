@@ -16,7 +16,7 @@ public interface Tree<T extends Comparable> {
     
     public Tree add(T element);
     boolean contains(T element);
-    public Tree remove();
+    public Tree remove(T element);
     boolean isEmpty();
     public int size();
     public Iterator<T> preIterator();
