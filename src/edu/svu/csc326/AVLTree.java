@@ -266,7 +266,8 @@ public class AVLTree<T extends Comparable> implements Tree<T> {
                  }else if (!matchSigns(childFactor, balanceFactor)){ //if signs do not match, double rotation required.
                rebalance(child, !right, childFactor);  
                  }
-        }       balanceFactor = balanceFactor(root); //Check again if root is balanced.
+        } 
+        balanceFactor = balanceFactor(root); //Check again if root is balanced.
         if(balanceFactor > 1 || balanceFactor < -1){
                 rotate(n, right);
         }

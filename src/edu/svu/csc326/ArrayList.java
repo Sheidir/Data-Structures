@@ -21,6 +21,10 @@ public class ArrayList<T> implements List<T> {
 /**
  * Default Constructor creates an ArrayList with size 20;
  */
+    public ArrayList(ArrayList<T> oldList){
+        this.list = Arrays.copyOf(oldList.list, oldList.length);
+        this.length = oldList.length;
+    }
     public ArrayList() {
         this(20);
 
