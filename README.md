@@ -1,2 +1,2 @@
-# JavaWork
-Projects in Java
+# DataStructures
+Copies of my implementation of several Data Structures.
